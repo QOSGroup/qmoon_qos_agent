@@ -53,17 +53,3 @@ func TestQueryProposals(t *testing.T) {
 	bytes, err := cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }
-
-func TestQueryProposals(t *testing.T) {
-	viper.Set(types.FlagNode, "39.97.234.227:26657")
-	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
-	viper.Set(types.FlagNonce, 0)
-
-	Tout, err := QueryProposals(cdc)
-	if err != nil {
-		t.Log(err)
-		return
-	}
-	bytes, err := cdc.MarshalJSON(Tout)
-	t.Log(string(bytes))
-}
