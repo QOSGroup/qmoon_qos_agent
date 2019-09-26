@@ -31,7 +31,7 @@ var (
 )
 
 func init() {
-	ServerCmd.PersistentFlags().StringVar(&laddr, "laddr", "0.0.0.0:19527", "listen addr")
+	ServerCmd.PersistentFlags().StringVar(&laddr, "laddr", "0.0.0.0:19528", "listen addr")
 	cdc = RegisterCodec()
 }
 
@@ -66,10 +66,9 @@ func server(cmd *cobra.Command, args []string) error {
 }
 
 func queryProposal(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
 
 	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
 	if err != nil {
@@ -86,10 +85,9 @@ func queryProposal(ctx *gin.Context) {
 }
 
 func queryProposals(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
 
 	//statusStr := ctx.Query("status")
 	result, err := gov.QueryProposals(cdc)
@@ -102,10 +100,9 @@ func queryProposals(ctx *gin.Context) {
 }
 
 func queryVotes(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
 
 	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
 	if err != nil {
@@ -122,10 +119,9 @@ func queryVotes(ctx *gin.Context) {
 }
 
 func queryDeposits(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
 
 	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
 	if err != nil {
@@ -142,10 +138,9 @@ func queryDeposits(ctx *gin.Context) {
 }
 
 func queryTally(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
 
 	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
 	if err != nil {
