@@ -12,6 +12,7 @@ import (
 	"github.com/tendermint/go-amino"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
@@ -58,10 +59,8 @@ func server(cmd *cobra.Command, args []string) error {
 	//r.POST("/txs", nil)
 	r.GET("/gov/proposal", queryProposal)
 	r.GET("/gov/proposals", queryProposals)
-	r.GET("/gov/vote", queryVote)
 	r.GET("/gov/votes", queryVotes)
-	r.GET("/gov/deposit", queryDeposit)
-	r.GET("/gov/deposit", queryDeposits)
+	r.GET("/gov/deposits", queryDeposits)
 	r.GET("/gov/tally", queryTally)
 	return r.Run(laddr)
 }
@@ -72,8 +71,12 @@ func queryProposal(ctx *gin.Context) {
 	viper.Set(types.FlagNonceNode, remote)
 	viper.Set(types.FlagNonce, 0)
 
-	pId := ctx.GetInt("pId")
-	result, err := gov.QueryProposal(cdc, int64(pId))
+	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	result, err := gov.QueryProposal(cdc, pId)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -88,31 +91,11 @@ func queryProposals(ctx *gin.Context) {
 	viper.Set(types.FlagNonceNode, remote)
 	viper.Set(types.FlagNonce, 0)
 
-	limit := ctx.GetInt64("pId")
-	depositor := ctx.Query("pId")
-	voter := ctx.Query("pId")
-	statusStr := ctx.Query("pId")
-	result, err := gov.QueryProposals(cdc, limit, depositor, voter, statusStr)
+	//statusStr := ctx.Query("status")
+	result, err := gov.QueryProposals(cdc)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
-		return
-	}
-	ctx.JSON(http.StatusOK, result)
-}
-
-func queryVote(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
-
-	pId := ctx.GetInt64("pId")
-	addrStr := ctx.Query("pId")
-	result, err := gov.QueryVote(cdc, pId, addrStr)
-	log.Printf("res:%+v, err:%+v", result, err)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err)
+		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	ctx.JSON(http.StatusOK, result)
@@ -124,25 +107,12 @@ func queryVotes(ctx *gin.Context) {
 	viper.Set(types.FlagNonceNode, remote)
 	viper.Set(types.FlagNonce, 0)
 
-	pId := ctx.GetInt64("pId")
-	result, err := gov.QueryVotes(cdc, pId)
-	log.Printf("res:%+v, err:%+v", result, err)
+	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, result)
-}
-
-func queryDeposit(ctx *gin.Context) {
-	remote := ctx.Query("remote")
-	viper.Set(types.FlagNode, remote)
-	viper.Set(types.FlagNonceNode, remote)
-	viper.Set(types.FlagNonce, 0)
-
-	pId := ctx.GetInt64("pId")
-	addrStr := ctx.Query("pId")
-	result, err := gov.QueryDeposit(cdc, pId, addrStr)
+	result, err := gov.QueryVotes(cdc, pId)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
@@ -157,7 +127,11 @@ func queryDeposits(ctx *gin.Context) {
 	viper.Set(types.FlagNonceNode, remote)
 	viper.Set(types.FlagNonce, 0)
 
-	pId := ctx.GetInt64("pId")
+	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
 	result, err := gov.QueryDeposits(cdc, pId)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
@@ -173,9 +147,12 @@ func queryTally(ctx *gin.Context) {
 	viper.Set(types.FlagNonceNode, remote)
 	viper.Set(types.FlagNonce, 0)
 
-	pId := ctx.GetInt64("pId")
-	addrStr := ctx.Query("pId")
-	result, err := gov.QueryTally(cdc, pId, addrStr)
+	pId, err := strconv.ParseInt(ctx.Query("pId"), 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	result, err := gov.QueryTally(cdc, pId)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)

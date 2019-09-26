@@ -3,9 +3,7 @@ package gov
 import (
 	"errors"
 	"fmt"
-	qcliacc "github.com/QOSGroup/qbase/client/account"
 	"github.com/QOSGroup/qbase/client/context"
-	btypes "github.com/QOSGroup/qbase/types"
 	"github.com/QOSGroup/qos/module/gov/mapper"
 	"github.com/QOSGroup/qos/module/gov/types"
 	go_amino "github.com/tendermint/go-amino"
@@ -22,7 +20,7 @@ func QueryProposal(cdc *go_amino.Codec, pID int64) (types.Proposal, error) {
 	res, err := cliCtx.Query(path, []byte{})
 
 	if err != nil {
-		return types.Proposal{}, nil
+		return types.Proposal{}, err
 	}
 
 	if len(res) == 0 {
@@ -34,30 +32,29 @@ func QueryProposal(cdc *go_amino.Codec, pID int64) (types.Proposal, error) {
 	return result, err
 }
 
-func QueryProposals(cdc *go_amino.Codec, limit int64, depositor, voter, statusStr string) ([]types.Proposal, error) {
+func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, statusStr string*/ ) ([]types.Proposal, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-	var depositorAddr btypes.AccAddress
-	var voterAddr btypes.AccAddress
+	//var depositorAddr btypes.AccAddress
+	//var voterAddr btypes.AccAddress
 	var status types.ProposalStatus
 
-	if d, err := qcliacc.GetAddrFromValue(cliCtx, depositor); err == nil {
-		depositorAddr = d
-	}
+	//if d, err := qcliacc.GetAddrFromValue(cliCtx, depositor); err == nil {
+	//	depositorAddr = d
+	//}
+	//
+	//if d, err := qcliacc.GetAddrFromValue(cliCtx, voter); err == nil {
+	//	voterAddr = d
+	//}
 
-	if d, err := qcliacc.GetAddrFromValue(cliCtx, voter); err == nil {
-		voterAddr = d
-	}
-
-	status = toProposalStatus(statusStr)
+	//status = toProposalStatus(statusStr)
 
 	queryParam := mapper.QueryProposalsParam{
-		Depositor: depositorAddr,
-		Voter:     voterAddr,
+		Depositor: nil,
+		Voter:     nil,
 		Status:    status,
-		Limit:     limit,
+		Limit:     1000000,
 	}
-
 	data, err := cliCtx.Codec.MarshalJSON(queryParam)
 	if err != nil {
 		return nil, err
@@ -98,31 +95,31 @@ func toProposalStatus(statusStr string) types.ProposalStatus {
 	}
 }
 
-func QueryVote(cdc *go_amino.Codec, pID int64, addrStr string) (types.Vote, error) {
-	cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-	addr, err := qcliacc.GetAddrFromValue(cliCtx, addrStr)
-	if err != nil {
-		return types.Vote{}, fmt.Errorf("voter %s is not a valid address value", addrStr)
-	}
-
-	path := mapper.BuildQueryVotePath(pID, addr.String())
-	res, err := cliCtx.Query(path, []byte{})
-	if err != nil {
-		return types.Vote{}, err
-	}
-
-	if len(res) == 0 {
-		return types.Vote{}, errors.New("no result found")
-	}
-
-	var vote types.Vote
-	if err := cliCtx.Codec.UnmarshalJSON(res, &vote); err != nil {
-		return types.Vote{}, err
-	}
-
-	return vote, err
-}
+//func QueryVote(cdc *go_amino.Codec, pID int64, addrStr string) (types.Vote, error) {
+//	cliCtx := context.NewCLIContext().WithCodec(cdc)
+//
+//	addr, err := qcliacc.GetAddrFromValue(cliCtx, addrStr)
+//	if err != nil {
+//		return types.Vote{}, fmt.Errorf("voter %s is not a valid address value", addrStr)
+//	}
+//
+//	path := mapper.BuildQueryVotePath(pID, addr.String())
+//	res, err := cliCtx.Query(path, []byte{})
+//	if err != nil {
+//		return types.Vote{}, err
+//	}
+//
+//	if len(res) == 0 {
+//		return types.Vote{}, errors.New("no result found")
+//	}
+//
+//	var vote types.Vote
+//	if err := cliCtx.Codec.UnmarshalJSON(res, &vote); err != nil {
+//		return types.Vote{}, err
+//	}
+//
+//	return vote, err
+//}
 
 func QueryVotes(cdc *go_amino.Codec, pID int64) ([]types.Vote, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
@@ -149,36 +146,36 @@ func QueryVotes(cdc *go_amino.Codec, pID int64) ([]types.Vote, error) {
 	return votes, err
 }
 
-func QueryDeposit(cdc *go_amino.Codec, pID int64, addrStr string) (types.Deposit, error) {
-	cliCtx := context.NewCLIContext().WithCodec(cdc)
-
-	addr, err := qcliacc.GetAddrFromValue(cliCtx, addrStr)
-	if err != nil {
-		return types.Deposit{}, fmt.Errorf("voter %s is not a valid address value", addrStr)
-	}
-
-	path := mapper.BuildQueryVotePath(pID, addr.String())
-	res, err := cliCtx.Query(path, []byte{})
-	if err != nil {
-		return types.Deposit{}, err
-	}
-
-	if len(res) == 0 {
-		return types.Deposit{}, errors.New("no result found")
-	}
-
-	var deposit types.Deposit
-	if err := cliCtx.Codec.UnmarshalJSON(res, &deposit); err != nil {
-		return types.Deposit{}, nil
-	}
-
-	return deposit, err
-}
+//func QueryDeposit(cdc *go_amino.Codec, pID int64, addrStr string) (types.Deposit, error) {
+//	cliCtx := context.NewCLIContext().WithCodec(cdc)
+//
+//	addr, err := qcliacc.GetAddrFromValue(cliCtx, addrStr)
+//	if err != nil {
+//		return types.Deposit{}, fmt.Errorf("voter %s is not a valid address value", addrStr)
+//	}
+//
+//	path := mapper.BuildQueryVotePath(pID, addr.String())
+//	res, err := cliCtx.Query(path, []byte{})
+//	if err != nil {
+//		return types.Deposit{}, err
+//	}
+//
+//	if len(res) == 0 {
+//		return types.Deposit{}, errors.New("no result found")
+//	}
+//
+//	var deposit types.Deposit
+//	if err := cliCtx.Codec.UnmarshalJSON(res, &deposit); err != nil {
+//		return types.Deposit{}, nil
+//	}
+//
+//	return deposit, err
+//}
 
 func QueryDeposits(cdc *go_amino.Codec, pID int64) ([]types.Deposit, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-	path := mapper.BuildQueryVotesPath(pID)
+	path := mapper.BuildQueryDepositsPath(pID)
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
 		return nil, err
@@ -196,15 +193,10 @@ func QueryDeposits(cdc *go_amino.Codec, pID int64) ([]types.Deposit, error) {
 	return deposits, err
 }
 
-func QueryTally(cdc *go_amino.Codec, pID int64, addrStr string) (types.TallyResult, error) {
+func QueryTally(cdc *go_amino.Codec, pID int64 /*, addrStr string*/) (types.TallyResult, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-	addr, err := qcliacc.GetAddrFromValue(cliCtx, addrStr)
-	if err != nil {
-		return types.TallyResult{}, fmt.Errorf("voter %s is not a valid address value", addrStr)
-	}
-
-	path := mapper.BuildQueryVotePath(pID, addr.String())
+	path := mapper.BuildQueryTallyPath(pID)
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
 		return types.TallyResult{}, err
@@ -216,7 +208,7 @@ func QueryTally(cdc *go_amino.Codec, pID int64, addrStr string) (types.TallyResu
 
 	var result types.TallyResult
 	if err := cliCtx.Codec.UnmarshalJSON(res, &result); err != nil {
-		return types.TallyResult{}, nil
+		return types.TallyResult{}, err
 	}
 
 	return result, err
