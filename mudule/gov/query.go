@@ -9,7 +9,7 @@ import (
 	go_amino "github.com/tendermint/go-amino"
 )
 
-func QueryProposal(cdc *go_amino.Codec, pID int64) (types.Proposal, error) {
+func QueryProposal(cdc *go_amino.Codec, pID int64) (result types.Proposal, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	//pID, err := strconv.ParseUint(args[0], 10, 64)
 	//if err != nil {
@@ -20,19 +20,18 @@ func QueryProposal(cdc *go_amino.Codec, pID int64) (types.Proposal, error) {
 	res, err := cliCtx.Query(path, []byte{})
 
 	if err != nil {
-		return types.Proposal{}, err
+		return
 	}
-
 	if len(res) == 0 {
-		return types.Proposal{}, errors.New("no result found")
+		err = errors.New("no result found")
+		return
 	}
 
-	var result types.Proposal
 	err = cliCtx.Codec.UnmarshalJSON(res, &result)
-	return result, err
+	return
 }
 
-func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, statusStr string*/ ) ([]types.Proposal, error) {
+func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, statusStr string*/) (result []types.Proposal, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 	//var depositorAddr btypes.AccAddress
@@ -57,27 +56,27 @@ func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, status
 	}
 	data, err := cliCtx.Codec.MarshalJSON(queryParam)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	path := mapper.BuildQueryProposalsPath()
 	res, err := cliCtx.Query(path, data)
-
+	if err != nil {
+		return
+	}
 	if len(res) == 0 {
-		return nil, errors.New("no result found")
+		err = errors.New("no result found")
+		return
 	}
 
-	var result []types.Proposal
-	err = cliCtx.Codec.UnmarshalJSON(res, &result)
-	if err != nil {
-		return nil, err
+	if err = cliCtx.Codec.UnmarshalJSON(res, &result); err != nil {
+		return
 	}
 
 	if len(result) == 0 {
-		return nil, fmt.Errorf("no matching proposals found")
+		err = fmt.Errorf("no matching proposals found")
 	}
-
-	return result, err
+	return
 }
 
 func toProposalStatus(statusStr string) types.ProposalStatus {
@@ -121,29 +120,28 @@ func toProposalStatus(statusStr string) types.ProposalStatus {
 //	return vote, err
 //}
 
-func QueryVotes(cdc *go_amino.Codec, pID int64) ([]types.Vote, error) {
+func QueryVotes(cdc *go_amino.Codec, pID int64) (votes []types.Vote, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 	path := mapper.BuildQueryVotesPath(pID)
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	if len(res) == 0 {
-		return nil, errors.New("no result found")
+		err = errors.New("no result found")
+		return
 	}
 
-	var votes []types.Vote
-	if err := cliCtx.Codec.UnmarshalJSON(res, &votes); err != nil {
-		return nil, err
+	if err = cliCtx.Codec.UnmarshalJSON(res, &votes); err != nil {
+		return
 	}
 
 	if len(votes) == 0 {
-		return nil, errors.New("no votes found")
+		err = errors.New("no votes found")
 	}
-
-	return votes, err
+	return
 }
 
 //func QueryDeposit(cdc *go_amino.Codec, pID int64, addrStr string) (types.Deposit, error) {
@@ -172,44 +170,38 @@ func QueryVotes(cdc *go_amino.Codec, pID int64) ([]types.Vote, error) {
 //	return deposit, err
 //}
 
-func QueryDeposits(cdc *go_amino.Codec, pID int64) ([]types.Deposit, error) {
+func QueryDeposits(cdc *go_amino.Codec, pID int64) (deposits []types.Deposit, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 	path := mapper.BuildQueryDepositsPath(pID)
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	if len(res) == 0 {
-		return nil, errors.New("no result found")
+		err = errors.New("no result found")
+		return
 	}
 
-	var deposits []types.Deposit
-	if err := cliCtx.Codec.UnmarshalJSON(res, &deposits); err != nil {
-		return nil, err
-	}
-
-	return deposits, err
+	err = cliCtx.Codec.UnmarshalJSON(res, &deposits)
+	return
 }
 
-func QueryTally(cdc *go_amino.Codec, pID int64 /*, addrStr string*/) (types.TallyResult, error) {
+func QueryTally(cdc *go_amino.Codec, pID int64 /*, addrStr string*/) (result types.TallyResult, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 	path := mapper.BuildQueryTallyPath(pID)
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
-		return types.TallyResult{}, err
+		return
 	}
 
 	if len(res) == 0 {
-		return types.TallyResult{}, errors.New("no result found")
+		err = errors.New("no result found")
+		return
 	}
 
-	var result types.TallyResult
-	if err := cliCtx.Codec.UnmarshalJSON(res, &result); err != nil {
-		return types.TallyResult{}, err
-	}
-
-	return result, err
+	err = cliCtx.Codec.UnmarshalJSON(res, &result)
+	return
 }
