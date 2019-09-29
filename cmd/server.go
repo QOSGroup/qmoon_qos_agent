@@ -6,6 +6,7 @@ import (
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/distribution"
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/gov"
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/mint"
+	"github.com/QOSGroup/qmoon_qos_agent/mudule/stake"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
@@ -34,5 +35,6 @@ func server(cmd *cobra.Command, args []string) error {
 	gov.Register(r)
 	distribution.Register(r)
 	mint.Register(r)
+	stake.Register(r)
 	return r.Run(laddr)
 }
