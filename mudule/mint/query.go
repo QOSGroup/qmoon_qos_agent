@@ -43,10 +43,10 @@ func QueryTotal(cdc *amino.Codec) (result btypes.BigInt, err error) {
 	return
 }
 
-func QueryApplied(cdc *amino.Codec) (result []types.InflationPhrase, err error) {
+func QueryApplied(cdc *amino.Codec) (result btypes.BigInt, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
-	path := mapper.BuildQueryPhrasesPath()
+	path := mapper.BuildQueryAppliedPath()
 	res, err := cliCtx.Query(path, []byte{})
 	if err != nil {
 		return
