@@ -1,42 +1,27 @@
 package gov
 
 import (
-	bcli "github.com/QOSGroup/qbase/client"
-	"github.com/QOSGroup/qbase/client/block"
 	"github.com/QOSGroup/qbase/client/types"
-	"github.com/QOSGroup/qos/app"
+	"github.com/QOSGroup/qmoon_qos_agent/codec"
 	"github.com/spf13/viper"
-	"github.com/tendermint/go-amino"
 	"testing"
 )
 
-var (
-	cdc *amino.Codec
-)
-
-func init() {
-	cdc = app.MakeCodec()
-	// query commands
-	queryCommands := bcli.QueryCommand(cdc)
-	app.ModuleBasics.AddQueryCommands(queryCommands, cdc)
-	queryCommands.AddCommand(block.BlockCommand(cdc)...)
-
-	// txs commands
-	txsCommands := bcli.TxCommand()
-	app.ModuleBasics.AddTxCommands(txsCommands, cdc)
-}
-
 func TestQueryProposal(t *testing.T) {
+	//time := time.Time{}
+	//bytes, _ := codec.Cdc.MarshalJSON(time)
+	//t.Log(string(bytes))
+
 	viper.Set(types.FlagNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonce, 0)
 
-	Tout, err := QueryProposal(cdc, 1)
+	Tout, err := QueryProposal(codec.Cdc, 1)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	bytes, err := cdc.MarshalJSON(Tout)
+	bytes, err := codec.Cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }
 
@@ -45,12 +30,12 @@ func TestQueryProposals(t *testing.T) {
 	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonce, 0)
 
-	Tout, err := QueryProposals(cdc)
+	Tout, err := QueryProposals(codec.Cdc)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	bytes, err := cdc.MarshalJSON(Tout)
+	bytes, err := codec.Cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }
 
@@ -59,12 +44,12 @@ func TestQueryVotes(t *testing.T) {
 	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonce, 0)
 
-	Tout, err := QueryVotes(cdc, 1)
+	Tout, err := QueryVotes(codec.Cdc, 1)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	bytes, err := cdc.MarshalJSON(Tout)
+	bytes, err := codec.Cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }
 
@@ -73,12 +58,12 @@ func TestQueryDeposits(t *testing.T) {
 	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonce, 0)
 
-	Tout, err := QueryDeposits(cdc, 1)
+	Tout, err := QueryDeposits(codec.Cdc, 1)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	bytes, err := cdc.MarshalJSON(Tout)
+	bytes, err := codec.Cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }
 
@@ -87,11 +72,11 @@ func TestQueryTally(t *testing.T) {
 	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
 	viper.Set(types.FlagNonce, 0)
 
-	Tout, err := QueryTally(cdc, 1)
+	Tout, err := QueryTally(codec.Cdc, 1)
 	if err != nil {
 		t.Log(err)
 		return
 	}
-	bytes, err := cdc.MarshalJSON(Tout)
+	bytes, err := codec.Cdc.MarshalJSON(Tout)
 	t.Log(string(bytes))
 }

@@ -6,6 +6,7 @@ import (
 	bctypes "github.com/QOSGroup/qbase/client/types"
 	"github.com/QOSGroup/qbase/store"
 	btypes "github.com/QOSGroup/qbase/types"
+	"github.com/QOSGroup/qos/module/stake/mapper"
 	"github.com/QOSGroup/qos/module/stake/types"
 	"github.com/spf13/viper"
 	"github.com/tendermint/go-amino"
@@ -37,8 +38,9 @@ type validatorDisplayInfo struct {
 	InactiveTime   time.Time `json:"inactiveTime"`
 	InactiveHeight int64     `json:"inactiveHeight"`
 
-	MinPeriod  int64 `json:"minPeriod"`
-	BondHeight int64 `json:"bondHeight"`
+	MinPeriod  int64         `json:"minPeriod"`
+	BondHeight int64         `json:"bondHeight"`
+	SelfBond   btypes.BigInt `json:"selfBond"`
 }
 
 func toValidatorDisplayInfo(validator types.Validator) validatorDisplayInfo {
@@ -110,6 +112,12 @@ func QueryValidators(cdc *amino.Codec) (validators []validatorDisplayInfo, err e
 		cdc.UnmarshalBinaryBare(kv.Value, &validator)
 		validators = append(validators, toValidatorDisplayInfo(validator))
 	}
+	for index, v := range validators {
+		result, err := QueryDelegationInfo(cdc, v.OperatorAddress, v.Owner)
+		if err == nil {
+			validators[index].SelfBond = result.Amount
+		}
+	}
 	return
 }
 
@@ -139,5 +147,31 @@ func QueryTotalValidatorBondToken(cdc *amino.Codec) (result btypes.BigInt, err e
 	for _, v := range validators {
 		result = result.Add(v.BondTokens)
 	}
+	return
+}
+
+func QueryDelegationInfo(cdc *amino.Codec, validator btypes.ValAddress, delegator btypes.AccAddress) (result mapper.DelegationQueryResult, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+	//var validator btypes.ValAddress
+	//var delegator btypes.AccAddress
+	//
+	//if o, err := qcliacc.GetValidatorAddrFromFlag(cliCtx, validatorAddr); err == nil {
+	//	validator = o
+	//}
+	//
+	//if d, err := qcliacc.GetAddrFromFlag(cliCtx, delegatorAddr); err == nil {
+	//	delegator = d
+	//}
+
+	var path = types.BuildGetDelegationCustomQueryPath(delegator, validator)
+
+	res, err := cliCtx.Query(path, []byte(""))
+	if err != nil {
+		return
+	}
+
+	//var result mapper.DelegationQueryResult
+	cliCtx.Codec.UnmarshalJSON(res, &result)
 	return
 }
