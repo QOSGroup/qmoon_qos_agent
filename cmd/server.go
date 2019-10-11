@@ -3,6 +3,7 @@
 package cmd
 
 import (
+	"github.com/QOSGroup/qmoon_qos_agent/mudule/block"
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/distribution"
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/gov"
 	"github.com/QOSGroup/qmoon_qos_agent/mudule/mint"
@@ -32,6 +33,7 @@ type TxQuery struct {
 
 func server(cmd *cobra.Command, args []string) error {
 	r := gin.Default()
+	block.Register(r)
 	gov.Register(r)
 	distribution.Register(r)
 	mint.Register(r)
