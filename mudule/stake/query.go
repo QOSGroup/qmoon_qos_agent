@@ -2,6 +2,7 @@ package stake
 
 import (
 	"errors"
+	qcliacc "github.com/QOSGroup/qbase/client/account"
 	"github.com/QOSGroup/qbase/client/context"
 	bctypes "github.com/QOSGroup/qbase/client/types"
 	"github.com/QOSGroup/qbase/store"
@@ -172,6 +173,27 @@ func QueryDelegationInfo(cdc *amino.Codec, validator btypes.ValAddress, delegato
 	}
 
 	//var result mapper.DelegationQueryResult
+	cliCtx.Codec.UnmarshalJSON(res, &result)
+	return
+}
+
+func QueryDelegationsWithValidator(cdc *amino.Codec, validatorAddr string) (result []mapper.DelegationQueryResult, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+
+	var validator btypes.ValAddress
+
+	if o, err := qcliacc.GetValidatorAddrFromValue(cliCtx, validatorAddr); err == nil {
+		validator = o
+	}
+
+	var path = types.BuildQueryDelegationsByOwnerCustomQueryPath(validator)
+
+	res, err := cliCtx.Query(path, []byte(""))
+	if err != nil {
+		return
+	}
+
+	//var result []mapper.DelegationQueryResult
 	cliCtx.Codec.UnmarshalJSON(res, &result)
 	return
 }
