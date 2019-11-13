@@ -7,10 +7,12 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func Register(engine *gin.Engine) {
 	engine.GET("/block/tx", queryTx)
+	engine.GET("/block", queryBlock)
 }
 
 func queryTx(ctx *gin.Context) {
@@ -26,4 +28,22 @@ func queryTx(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, result)
+}
+
+func queryBlock(ctx *gin.Context) {
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
+
+	if height, err := strconv.ParseInt(ctx.Query("height"), 10, 64); err == nil {
+		result, err := QueryBlock(codec.Cdc, height)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+			return
+		}
+		ctx.JSON(http.StatusOK, result)
+	} else {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
 }

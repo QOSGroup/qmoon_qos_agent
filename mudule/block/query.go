@@ -25,6 +25,22 @@ func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) 
 	return
 }
 
+func QueryBlock(cdc *amino.Codec, height int64) (*ctypes.ResultBlock, error){
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	resBlock, err := node.Block(&height)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resBlock, nil
+}
+
 // QueryTx queries for a single transaction by a hash string in hex format. An
 // error is returned if the transaction does not exist or cannot be queried.
 func QueryTxInner(cliCtx context.CLIContext, hashHexStr string) (btypes.TxResponse, error) {
