@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+func QueryStatus(cdc *amino.Codec) (result *ctypes.ResultStatus, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return
+	}
+	result, err = node.Status()
+	return
+}
+
 func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	result, err = QueryTxInner(cliCtx, tx)

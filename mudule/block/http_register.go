@@ -13,6 +13,21 @@ import (
 func Register(engine *gin.Engine) {
 	engine.GET("/block/tx", queryTx)
 	engine.GET("/block", queryBlock)
+	engine.GET("/status", queryStatus)
+}
+
+func queryStatus(ctx *gin.Context) {
+	nodeUrl := ctx.Query("node_url")
+	viper.Set(types.FlagNode, nodeUrl)
+	viper.Set(types.FlagNonceNode, nodeUrl)
+
+	result, err := QueryStatus(codec.Cdc)
+	log.Printf("res:%+v, err:%+v", result, err)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
 }
 
 func queryTx(ctx *gin.Context) {
