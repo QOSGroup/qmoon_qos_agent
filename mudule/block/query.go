@@ -11,6 +11,16 @@ import (
 	"time"
 )
 
+func QueryStatus(cdc *amino.Codec) (result *ctypes.ResultStatus, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return
+	}
+	result, err = node.Status()
+	return
+}
+
 func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	result, err = QueryTxInner(cliCtx, tx)
@@ -23,6 +33,22 @@ func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) 
 		return
 	}
 	return
+}
+
+func QueryBlock(cdc *amino.Codec, height int64) (*ctypes.ResultBlock, error){
+	cliCtx := context.NewCLIContext().WithCodec(cdc)
+	node, err := cliCtx.GetNode()
+	if err != nil {
+		return nil, err
+	}
+
+	resBlock, err := node.Block(&height)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return resBlock, nil
 }
 
 // QueryTx queries for a single transaction by a hash string in hex format. An
