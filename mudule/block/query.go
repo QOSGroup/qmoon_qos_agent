@@ -11,13 +11,18 @@ import (
 	"time"
 )
 
-func QueryStatus(cdc *amino.Codec) (result *ctypes.ResultStatus, err error) {
+type LatestHeight struct {
+	latest_height int64 `json:"latest_height"`
+}
+
+func QueryStatus(cdc *amino.Codec) (result LatestHeight, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	node, err := cliCtx.GetNode()
 	if err != nil {
 		return
 	}
-	result, err = node.Status()
+	status, err := node.Status()
+	result.latest_height = status.SyncInfo.LatestBlockHeight
 	return
 }
 
