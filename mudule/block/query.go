@@ -15,21 +15,21 @@ type LatestHeight struct {
 	latest_height int64 `json:"latest_height"`
 }
 
-func QueryStatus(cdc *amino.Codec) (*ctypes.ResultStatus, error) {
+func QueryStatus(cdc *amino.Codec) (*LatestHeight, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	node, err := cliCtx.GetNode()
 	if err != nil {
 		return nil, err
 	}
 	status, err := node.Status()
-	if err != nil {
-		return nil, err
-	}
-	return status, nil
-	//if err != nil{
-	//	return LatestHeight{}, err
+	//if err != nil {
+	//	return nil, err
 	//}
-	//return LatestHeight{latest_height:status.SyncInfo.LatestBlockHeight}, nil
+	//return status, nil
+	if err != nil{
+		return &LatestHeight{}, err
+	}
+	return &LatestHeight{latest_height:status.SyncInfo.LatestBlockHeight}, nil
 }
 
 func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) {
