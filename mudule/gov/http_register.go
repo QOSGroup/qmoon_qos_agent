@@ -1,6 +1,7 @@
 package gov
 
 import (
+	"fmt"
 	"github.com/QOSGroup/qbase/client/types"
 	"github.com/QOSGroup/qmoon_qos_agent/codec"
 	"github.com/gin-gonic/gin"
@@ -49,6 +50,9 @@ func queryProposals(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
+	bytes, err := codec.Cdc.MarshalJSON(result)
+	fmt.Println(string(bytes))
+
 	ctx.JSON(http.StatusOK, result)
 }
 
