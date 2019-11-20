@@ -26,8 +26,8 @@ func TestQueryProposal(t *testing.T) {
 }
 
 func TestQueryProposals(t *testing.T) {
-	viper.Set(types.FlagNode, "39.97.234.227:26657")
-	viper.Set(types.FlagNonceNode, "39.97.234.227:26657")
+	viper.Set(types.FlagNode, "47.103.79.28:26657")
+	viper.Set(types.FlagNonceNode, "47.103.79.28:26657")
 	viper.Set(types.FlagNonce, 0)
 
 	Tout, err := QueryProposals(codec.Cdc)

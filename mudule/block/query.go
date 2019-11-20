@@ -11,14 +11,25 @@ import (
 	"time"
 )
 
-func QueryStatus(cdc *amino.Codec) (result *ctypes.ResultStatus, err error) {
+type LatestHeight struct {
+	latest_height int64 `json:"latest_height"`
+}
+
+func QueryStatus(cdc *amino.Codec) (*ctypes.SyncInfo, error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	node, err := cliCtx.GetNode()
 	if err != nil {
-		return
+		return nil, err
 	}
-	result, err = node.Status()
-	return
+	status, err := node.Status()
+	if err != nil {
+		return nil, err
+	}
+	return &status.SyncInfo, nil
+	//if err != nil{
+	//	return &LatestHeight{}, err
+	//}
+	//return &LatestHeight{latest_height:status.SyncInfo.LatestBlockHeight}, nil
 }
 
 func QueryTx(cdc *amino.Codec, tx string) (result btypes.TxResponse, err error) {

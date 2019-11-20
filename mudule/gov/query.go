@@ -2,14 +2,16 @@ package gov
 
 import (
 	"errors"
-	"fmt"
 	"github.com/QOSGroup/qbase/client/context"
 	"github.com/QOSGroup/qos/module/gov/mapper"
 	"github.com/QOSGroup/qos/module/gov/types"
+
+	atype "github.com/QOSGroup/qmoon_qos_agent/types"
 	go_amino "github.com/tendermint/go-amino"
 )
 
-func QueryProposal(cdc *go_amino.Codec, pID int64) (result types.Proposal, err error) {
+
+func QueryProposal(cdc *go_amino.Codec, pID int64) (result atype.ResultProposal, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 	//pID, err := strconv.ParseUint(args[0], 10, 64)
 	//if err != nil {
@@ -27,11 +29,33 @@ func QueryProposal(cdc *go_amino.Codec, pID int64) (result types.Proposal, err e
 		return
 	}
 
-	err = cliCtx.Codec.UnmarshalJSON(res, &result)
+	pr := types.Proposal{}
+	err = cliCtx.Codec.UnmarshalJSON(res, &pr)
+	if err != nil {
+		return
+	}
+	result = atype.ResultProposal{
+		ProposalID: pr.ProposalID,
+		Type: pr.ProposalContent.GetProposalType().String(),
+		Title: pr.ProposalContent.GetTitle(),
+		Description: pr.ProposalContent.GetDescription(),
+		Level: string(pr.ProposalContent.GetProposalLevel()),
+
+		Status: pr.Status.String(),
+		FinalTallyResult: pr.FinalTallyResult,
+
+		SubmitTime:pr.SubmitTime,
+		DepositEndTime:pr.DepositEndTime,
+		TotalDeposit: pr.TotalDeposit,
+
+		VotingStartTime: pr.VotingStartTime,
+		VotingStartHeight: pr.VotingStartHeight,
+		VotingEndTime: pr.DepositEndTime,
+	}
 	return
 }
 
-func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, statusStr string*/) (result []types.Proposal, err error) {
+func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, statusStr string*/) (result []atype.ResultProposal, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc)
 
 	//var depositorAddr btypes.AccAddress
@@ -64,35 +88,57 @@ func QueryProposals(cdc *go_amino.Codec, /*limit int64, depositor, voter, status
 	if err != nil {
 		return
 	}
-	if len(res) == 0 {
-		err = errors.New("no result found")
+	//if len(res) == 0 {
+	//	err = errors.New("no result found")
+	//	return
+	//}
+	prs := make([]types.Proposal, 0)
+	if err = cliCtx.Codec.UnmarshalJSON(res, &prs); err != nil {
 		return
 	}
+	//
+	//if len(result) == 0 {
+	//	err = fmt.Errorf("no matching proposals found")
+	//}
 
-	if err = cliCtx.Codec.UnmarshalJSON(res, &result); err != nil {
-		return
-	}
+	for _, pr := range prs {
+		prop := atype.ResultProposal{
+			ProposalID: pr.ProposalID,
+			Type: pr.ProposalContent.GetProposalType().String(),
+			Title: pr.ProposalContent.GetTitle(),
+			Description: pr.ProposalContent.GetDescription(),
+			Level: string(pr.ProposalContent.GetProposalLevel()),
 
-	if len(result) == 0 {
-		err = fmt.Errorf("no matching proposals found")
+			Status: pr.Status.String(),
+			FinalTallyResult: pr.FinalTallyResult,
+
+			SubmitTime:pr.SubmitTime,
+			DepositEndTime:pr.DepositEndTime,
+			TotalDeposit: pr.TotalDeposit,
+
+			VotingStartTime: pr.VotingStartTime,
+			VotingStartHeight: pr.VotingStartHeight,
+			VotingEndTime: pr.DepositEndTime,
+		}
+		result = append(result, prop)
 	}
 	return
 }
 
-func toProposalStatus(statusStr string) types.ProposalStatus {
-	switch statusStr {
-	case "DepositPeriod", "deposit_period":
-		return types.StatusDepositPeriod
-	case "VotingPeriod", "voting_period":
-		return types.StatusVotingPeriod
-	case "Passed", "passed":
-		return types.StatusPassed
-	case "Rejected", "rejected":
-		return types.StatusRejected
-	default:
-		return types.StatusNil
-	}
-}
+//func toProposalStatus(statusStr string) types.ProposalStatus {
+//	switch statusStr {
+//	case "DepositPeriod", "deposit_period":
+//		return types.StatusDepositPeriod
+//	case "VotingPeriod", "voting_period":
+//		return types.StatusVotingPeriod
+//	case "Passed", "passed":
+//		return types.StatusPassed
+//	case "Rejected", "rejected":
+//		return types.StatusRejected
+//	default:
+//		return types.StatusNil
+//	}
+//}
 
 //func QueryVote(cdc *go_amino.Codec, pID int64, addrStr string) (types.Vote, error) {
 //	cliCtx := context.NewCLIContext().WithCodec(cdc)
