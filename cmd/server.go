@@ -3,11 +3,11 @@
 package cmd
 
 import (
-	"github.com/QOSGroup/qmoon_qos_agent/mudule/block"
-	"github.com/QOSGroup/qmoon_qos_agent/mudule/distribution"
-	"github.com/QOSGroup/qmoon_qos_agent/mudule/gov"
-	"github.com/QOSGroup/qmoon_qos_agent/mudule/mint"
-	"github.com/QOSGroup/qmoon_qos_agent/mudule/stake"
+	"github.com/QOSGroup/qmoon_qos_agent/module/block"
+	"github.com/QOSGroup/qmoon_qos_agent/module/distribution"
+	"github.com/QOSGroup/qmoon_qos_agent/module/gov"
+	"github.com/QOSGroup/qmoon_qos_agent/module/mint"
+	"github.com/QOSGroup/qmoon_qos_agent/module/stake"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
