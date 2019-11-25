@@ -196,3 +196,23 @@ func QueryDelegationsWithValidator(cdc *amino.Codec, ip string, validatorAddr st
 	cliCtx.Codec.UnmarshalJSON(res, &result)
 	return
 }
+
+func QueryDelegationsWithDelegator(cdc *amino.Codec, ip string, delegatorAddr string) (result []mapper.DelegationQueryResult, err error) {
+	cliCtx := context.NewCLIContext().WithCodec(cdc).WithNodeIP(ip)
+
+	var delegator btypes.AccAddress
+
+	if o, err := qcliacc.GetAddrFromValue(cliCtx, delegatorAddr); err == nil {
+		delegator = o
+	}
+	var path = types.BuildQueryDelegationsByDelegatorCustomQueryPath(delegator)
+
+	res, err := cliCtx.Query(path, []byte(""))
+	if err != nil {
+		return
+	}
+
+	//var result []mapper.DelegationQueryResult
+	cliCtx.Codec.UnmarshalJSON(res, &result)
+	return
+}
