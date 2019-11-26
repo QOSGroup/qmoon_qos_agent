@@ -12,6 +12,7 @@ func Register(engine *gin.Engine) {
 	engine.GET("/stake/validators", queryValidators)
 	engine.GET("/stake/validators/total/bond/tokens", queryTotalValidatorBondToken)
 	engine.GET("/stake/validator/delegations", queryDelegationsWithValidator)
+	engine.GET("/stake/delegator/delegations", queryDelegationsWithDelegator)
 }
 
 func queryValidators(ctx *gin.Context) {
@@ -26,6 +27,21 @@ func queryValidators(ctx *gin.Context) {
 	//}
 
 	result, err := QueryValidators(codec.Cdc, ipString, 0)
+	log.Printf("res:%+v, err:%+v", result, err)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, result)
+}
+
+func queryDelegationsWithDelegator(ctx *gin.Context) {
+	nodeUrl := ctx.Query("node_url")
+	ipString:= nodeUrl[:strings.LastIndex(nodeUrl, ":")]
+	ipString = strings.ReplaceAll(ipString, "http://", "")
+	delegatorAddr := ctx.Query("delegator")
+
+	result, err := QueryDelegationsWithDelegator(codec.Cdc, ipString, delegatorAddr)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
