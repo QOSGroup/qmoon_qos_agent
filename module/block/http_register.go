@@ -33,7 +33,7 @@ func queryTx(ctx *gin.Context) {
 	ipString:= nodeUrl[:strings.LastIndex(nodeUrl, ":")]
 	ipString = strings.ReplaceAll(ipString, "http://", "")
 	tx := ctx.Query("hash")
-	result, err := QueryTx(codec.Cdc, tx, ipString)
+	result, err := QueryTx(codec.Cdc, ipString, tx)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err)
