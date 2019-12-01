@@ -7,13 +7,13 @@ import (
 )
 
 func TestQueryTx(t *testing.T) {
-	nodeUrl:="47.103.79.28:26657"
+	nodeUrl:="http://47.103.79.28:26657"
 
 	ipString:= nodeUrl[:strings.LastIndex(nodeUrl, ":")]
-	strings.ReplaceAll(ipString, "http://", "")
+	ipString = strings.ReplaceAll(ipString, "http://", "")
 
-	//Tout, err := QueryTx(codec.Cdc, "443259A455F99566C901CD9A10F9541D26F8EED70B7480BD4F2312EC637A2875")
-	Tout, err := QueryStatus(codec.Cdc, ipString)
+	Tout, err := QueryTx(codec.Cdc, ipString, "C4CE4728774B67C064DF3274063A9035C95D0E92AD3073C717047B7A48486CBD")
+	// Tout, err := QueryStatus(codec.Cdc, ipString)
 	if err != nil {
 		t.Log(err)
 		return

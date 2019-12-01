@@ -8,6 +8,7 @@ import (
 	"github.com/tendermint/go-amino"
 	go_amino "github.com/tendermint/go-amino"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
+	"github.com/QOSGroup/qmoon_qos_agent/types"
 	"time"
 )
 
@@ -32,18 +33,45 @@ func QueryStatus(cdc *amino.Codec, ip string) (*ctypes.SyncInfo, error) {
 	//return &LatestHeight{latest_height:status.SyncInfo.LatestBlockHeight}, nil
 }
 
-func QueryTx(cdc *amino.Codec, ip string, tx string) (result btypes.TxResponse, err error) {
+func QueryTx(cdc *amino.Codec, ip string, tx string) (result types.TxResponseResult, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithNodeIP(ip)
-	result, err = QueryTxInner(cliCtx, tx)
+
+	result1, err := QueryTxInner(cliCtx, tx)
 	if err != nil {
 		return
 	}
 
-	if result.Empty() {
+	if result1.Empty() {
 		err = fmt.Errorf("No transaction found with hash %s", tx)
 		return
 	}
+
+	result = types.TxResponseResult{
+		Height: result1.Height,
+		TxHash: result1.TxHash,
+		Code: result1.Code,
+		Data: result1.Data,
+		RawLog: result1.RawLog,
+		Info: result1.Info,
+		GasWanted: result1.GasWanted,
+		GasUsed: result1.GasUsed,
+		Codespace: result1.Codespace,
+		Tx: result1.Tx.Type(),
+		Timestamp: result1.Timestamp,
+	}
+
 	return
+
+	//var path = types.BuildQueryDelegationsByDelegatorCustomQueryPath(delegator)
+	//
+	//res, err := cliCtx.Query(path, []byte(""))
+	//if err != nil {
+	//	return
+	//}
+	//
+	////var result []mapper.DelegationQueryResult
+	//cliCtx.Codec.UnmarshalJSON(res, &result)
+	//return
 }
 
 func QueryBlock(cdc *amino.Codec, ip string, height int64) (*ctypes.ResultBlock, error){
