@@ -34,6 +34,7 @@ func QueryStatus(cdc *amino.Codec, ip string) (*ctypes.SyncInfo, error) {
 
 func QueryTx(cdc *amino.Codec, ip string, tx string) (result btypes.TxResponse, err error) {
 	cliCtx := context.NewCLIContext().WithCodec(cdc).WithNodeIP(ip)
+
 	result, err = QueryTxInner(cliCtx, tx)
 	if err != nil {
 		return
@@ -44,6 +45,17 @@ func QueryTx(cdc *amino.Codec, ip string, tx string) (result btypes.TxResponse, 
 		return
 	}
 	return
+
+	//var path = types.BuildQueryDelegationsByDelegatorCustomQueryPath(delegator)
+	//
+	//res, err := cliCtx.Query(path, []byte(""))
+	//if err != nil {
+	//	return
+	//}
+	//
+	////var result []mapper.DelegationQueryResult
+	//cliCtx.Codec.UnmarshalJSON(res, &result)
+	//return
 }
 
 func QueryBlock(cdc *amino.Codec, ip string, height int64) (*ctypes.ResultBlock, error){

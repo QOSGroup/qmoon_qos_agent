@@ -10,7 +10,7 @@ import (
 )
 
 func Register(engine *gin.Engine) {
-	engine.GET("/block/tx", queryTx)
+	engine.GET("/tx", queryTx)
 	engine.GET("/block", queryBlock)
 	engine.GET("/status", queryStatus)
 }
@@ -32,7 +32,7 @@ func queryTx(ctx *gin.Context) {
 	nodeUrl := ctx.Query("node_url")
 	ipString:= nodeUrl[:strings.LastIndex(nodeUrl, ":")]
 	ipString = strings.ReplaceAll(ipString, "http://", "")
-	tx := ctx.Query("tx")
+	tx := ctx.Query("hash")
 	result, err := QueryTx(codec.Cdc, tx, ipString)
 	log.Printf("res:%+v, err:%+v", result, err)
 	if err != nil {
